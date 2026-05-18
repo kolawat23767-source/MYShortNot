@@ -3,432 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MYShortNot - แอปสมุดโน้ตส่วนตัว</title>
+    <title>MYShortNot</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
 
     <style>
-        /* ==========================================================================
-           1. ระบบตัวแปรสี (CSS Variables) - สลับโหมดมืด/สว่าง
-           ========================================================================== */
+        /* ─── [ระบบตัวแปรสีสำหรับ Dark / Light Mode] ─── */
         :root {
-            /* ☀️ โหมดปกติ (Light Mode) */
-            --bg-body: #f4f6f9;
-            --bg-card: #ffffff;
-            --text-main: #333333;
-            --text-muted: #666666;
-            --border-color: #dcdcdc;
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --btn-bg: #f0f0f0;
+            --btn-text: #333333;
             
-            /* สีของปุ่มสวิตช์และปุ่มทั่วไป */
-            --btn-toggle-bg: #e2e8f0;
-            --btn-toggle-text: #334155;
-            --primary-color: #007bff;
-            --danger-color: #dc3545;
-            --radius-main: 12px;
+            /* ดึงตัวแปรเดิมในแอปของคุณมารองรับสีโหมดปกติ */
+            --bg: #ffffff;
+            --text: #333333;
+            --border: #cccccc; 
             --radius-sm: 8px;
         }
 
         body.dark-mode {
-            /* 🌙 โหมดมืด (Dark Mode) */
-            --bg-body: #121212;
-            --bg-card: #1e1e1e;
-            --text-main: #f5f5f5;
-            --text-muted: #aaaaaa;
-            --border-color: #333333;
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --btn-bg: #2a2a2a;
+            --btn-text: #ffffff;
             
-            --btn-toggle-bg: #2d3748;
-            --btn-toggle-text: #e2e8f0;
-            --primary-color: #3b82f6;
-            --danger-color: #ef4444;
+            /* สลับตัวแปรเดิมให้กลายเป็นสีมืด */
+            --bg: #1e1e1e;
+            --text: #e0e0e0;
+            --border: #444444;
         }
 
-        /* ==========================================================================
-           2. สไตล์หลักของหน้าเว็บ (Cleaned CSS)
-           ========================================================================== */
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
-
+        /* ─── [สไตล์เดิมของคุณ] ─── */
         body {
-            background-color: var(--bg-body);
-            color: var(--text-main);
+            background-color: var(--bg-color) !important;
+            color: var(--text-color) !important;
             font-family: 'Sarabun', sans-serif;
             margin: 0;
             padding: 0;
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* แถบเมนูด้านบน (Header) */
-        .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 25px;
-            background-color: var(--bg-card);
-            border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            transition: background-color 0.3s, border-color 0.3s;
+        /* หน้าจอหลักไอดีเดิมของคุณ */
+        #app-screen {
+            padding: 20px;
         }
 
-        .header-title {
-            margin: 0;
-            font-size: 22px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        /* ปุ่มสวิตช์สำหรับกดเปลี่ยนโหมด */
+        /* ปุ่มสวิตช์แต่งให้เรียบๆ ไม่กวนสายตา */
         .theme-btn {
-            padding: 8px 16px;
-            background-color: var(--btn-toggle-bg);
-            color: var(--btn-toggle-text);
-            border: 1px solid var(--border-color);
+            margin: 15px;
+            padding: 8px 15px;
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: 1px solid var(--border);
             border-radius: 20px;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: bold;
             font-family: 'Sarabun', sans-serif;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-        }
-        .theme-btn:hover {
-            opacity: 0.9;
-            transform: scale(1.02);
-        }
-
-        /* โครงสร้างพื้นที่ทำงานหลัก (แบ่งซ้าย-ขวา) */
-        .app-container {
-            display: block;
-            max-width: 1200px;
-            margin: 25px auto;
-            padding: 0 20px;
-        }
-
-        /* กล่องสไตล์ Card เอนกประสงค์ */
-        .main-card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-main);
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.01);
-            transition: background-color 0.3s, border-color 0.3s;
-            margin-bottom: 25px;
-        }
-
-        /* ส่วนฟอร์มจัดการและปุ่มต่างๆ */
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text-main);
-        }
-        .form-control {
-            width: 100%;
-            padding: 10px 12px;
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            font-family: 'Sarabun', sans-serif;
-            font-size: 15px;
             transition: all 0.3s;
         }
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
 
-        /* การจัดวางกลุ่มปุ่มควบคุม */
-        .action-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-            gap: 10px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-family: 'Sarabun', sans-serif;
-            font-weight: 500;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        .btn-danger {
-            background-color: var(--danger-color);
-            color: white;
-        }
-        .btn:hover {
-            opacity: 0.9;
-        }
-
-        /* ส่วนรายการโน้ตที่บันทึกไว้ด้านล่าง */
-        .notes-list-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: var(--text-main);
-        }
-        .notes-grid {
-            display: block; /* หลีกเลี่ยง flex/grid ใหญ่ยักษ์เพื่อให้ WeasyPrint รองรับได้ดีหากใช้พิมพ์ */
-        }
-        .note-item {
-            background-color: var(--bg-body);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            padding: 15px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.2s;
-        }
-        .note-item:hover {
-            border-color: var(--primary-color);
-        }
-        .note-item-title {
-            font-weight: 600;
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-        .note-item-date {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        /* ==========================================================================
-           3. ปรับแต่งส่วนหัวและกล่อง Quill Editor ให้รองรับโหมดมืดอัตโนมัติ
-           ========================================================================== */
+        /* สไตล์ของ Quill Editor ให้เปลี่ยนสีตามโหมดมืดอัตโนมัติ */
         .ql-toolbar.ql-snow {
-            border: 1px solid var(--border-color) !important;
-            border-top-left-radius: var(--radius-sm);
-            border-top-right-radius: var(--radius-sm);
-            background-color: var(--bg-card) !important;
-            transition: background-color 0.3s, border-color 0.3s;
+            border: 1px solid var(--border) !important;
+            background: var(--bg) !important;
+            transition: background 0.3s, border-color 0.3s;
         }
-
         .ql-container.ql-snow {
-            border: 1px solid var(--border-color) !important;
-            border-bottom-left-radius: var(--radius-sm);
-            border-bottom-right-radius: var(--radius-sm);
-            background-color: var(--bg-card) !important;
+            border: 1px solid var(--border) !important;
+            background: var(--bg) !important;
             font-family: 'Sarabun', sans-serif;
-            font-size: 15px;
-            transition: background-color 0.3s, border-color 0.3s;
+            font-size: 14px;
+            transition: background 0.3s, border-color 0.3s;
         }
-
-        /* ปรับสีไอคอนปุ่มกดและอักษรเมนูใน Quill สลับตาม Dark/Light อัตโนมัติ */
-        body.dark-mode .ql-snow .ql-stroke { stroke: var(--text-main) !important; }
-        body.dark-mode .ql-snow .ql-fill { fill: var(--text-main) !important; }
-        body.dark-mode .ql-snow .ql-picker { color: var(--text-main) !important; }
-        body.dark-mode .ql-snow .ql-picker-options { background-color: var(--bg-card) !important; }
+        
+        /* สลับสีไอคอนเครื่องมือ Quill ตอนโหมดมืด */
+        body.dark-mode .ql-snow .ql-stroke { stroke: var(--text) !important; }
+        body.dark-mode .ql-snow .ql-fill { fill: var(--text) !important; }
+        body.dark-mode .ql-snow .ql-picker { color: var(--text) !important; }
     </style>
     
     <script>
         if (localStorage.getItem('theme') === 'dark') {
             document.documentElement.classList.add('dark-mode-init');
-            // จะทำงานร่วมกับการเติมคลาสที่ body ตอนโหลดเสร็จ
         }
     </script>
 </head>
 <body>
 
-    <div class="app-header">
-        <div class="header-title">MYShortNot</div>
-        
-        <button id="theme-toggle" class="theme-btn">
-            <span id="theme-icon">🌙</span>
-            <span id="theme-text">Dark Mode</span>
-        </button>
-    </div>
+    <button id="theme-toggle" class="theme-btn">
+        <span id="theme-icon">🌙</span> <span id="theme-text">Dark Mode</span>
+    </button>
 
-    <div class="app-container">
-        
-        <div class="main-card">
-            <div class="form-group">
-                <label class="form-label" for="note-title">หัวข้อบันทึก</label>
-                <input type="text" id="note-title" class="form-control" placeholder="ระบุหัวข้อเรื่องที่นี่...">
+    <div id="app-screen">
+        <header>
+            <div class="header-brand" id="header-brand" style="color: var(--text); font-size: 20px; font-weight: bold; margin-bottom: 15px;">
+                MYShortNot
             </div>
+        </header>
 
-            <div class="form-group" style="margin-top: 20px;">
-                <label class="form-label">เนื้อหาบันทึก</label>
-                <div id="editor-container" style="height: 300px;"></div>
-            </div>
-
-            <div class="action-bar">
-                <button id="btn-save" class="btn btn-primary">💾 บันทึกโน้ต</button>
-                <button id="btn-clear" class="btn btn-danger" style="display: none;">🗑️ ลบโน้ตนี้</button>
-            </div>
-        </div>
-
-        <div class="main-card">
-            <div class="notes-list-title">📋 บันทึกทั้งหมดของฉัน</div>
-            <div id="notes-display-area" class="notes-grid">
-                </div>
-        </div>
-
+        <div id="editor-container" style="height: 300px; margin-top: 10px;"></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
     <script>
-        // 1. เรียกใช้งานและตั้งค่าการทำงานของ Quill Editor
+        // เรียกใช้ Quill บนไอดีเดิม
         const quill = new Quill('#editor-container', {
-            theme: 'snow',
-            placeholder: 'พิมพ์ข้อความสั้นๆ หรือเนื้อหาบันทึกสำคัญของคุณตรงนี้...'
+            theme: 'snow'
         });
 
-        // ดึง Element ตัวแปรสำคัญของแอปมาใช้งาน
+        // ระบบสลับโหมดมืด/สว่าง และระลึกความจำ
         const themeToggleBtn = document.getElementById('theme-toggle');
         const themeIcon = document.getElementById('theme-icon');
         const themeText = document.getElementById('theme-text');
-        
-        const noteTitleInput = document.getElementById('note-title');
-        const saveBtn = document.getElementById('btn-save');
-        const deleteBtn = document.getElementById('btn-clear');
-        const notesDisplayArea = document.getElementById('notes-display-area');
 
-        // ตัวแปรระบบในการจัดการ Array ข้อมูลโน้ต
-        let notesArray = JSON.parse(localStorage.getItem('myshortnot_data')) || [];
-        let activeNoteId = null; // เช็คว่ากำลังเปิดอ่านโน้ตเก่าตัวไหนอยู่ไหม
-
-        // 2. ฟังก์ชันจัดการระบบธีม (Dark / Light Mode)
-        function applyTheme(isDark) {
-            if (isDark) {
-                document.body.classList.add('dark-mode');
-                themeIcon.textContent = '☀️';
-                themeText.textContent = 'Light Mode';
-            } else {
-                document.body.classList.remove('dark-mode');
-                themeIcon.textContent = '🌙';
-                themeText.textContent = 'Dark Mode';
-            }
+        function updateButtonUI(isDark) {
+            themeIcon.textContent = isDark ? '☀️' : '🌙';
+            themeText.textContent = isDark ? 'Light Mode' : 'Dark Mode';
         }
 
-        // ตรวจสอบความจำเรื่องสีธีมทันทีเมื่อเปิดหน้าเว็บเข้ามา
+        // เช็คความจำเมื่อเปิดเว็บ
         if (localStorage.getItem('theme') === 'dark') {
-            applyTheme(true);
+            document.body.classList.add('dark-mode');
+            updateButtonUI(true);
         }
 
-        // ดักจับเหตุการณ์การกดสลับปุ่ม Dark Mode
+        // ทำงานเมื่อกดปุ่มสลับโหมด
         themeToggleBtn.addEventListener('click', () => {
-            const isDarkNow = document.body.classList.toggle('dark-mode');
-            localStorage.setItem('theme', isDarkNow ? 'dark' : 'light');
-            applyTheme(isDarkNow);
+            const isDarkModeNow = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', isDarkModeNow ? 'dark' : 'light');
+            updateButtonUI(isDarkModeNow);
         });
-
-        // 3. ฟังก์ชันระบบจัดการโน้ต (Core App Logic)
-        
-        // ฟังก์ชันเรนเดอร์รายการโน้ตทั้งหมดลงบนหน้าจอ
-        function renderNotesList() {
-            notesDisplayArea.innerHTML = '';
-            
-            if (notesArray.length === 0) {
-                notesDisplayArea.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 20px;">ยังไม่มีบันทึกถูกเก็บไว้ เริ่มพิมพ์ด้านบนได้เลย!</div>`;
-                return;
-            }
-
-            notesArray.forEach(note => {
-                const noteElement = document.createElement('div');
-                noteElement.className = 'note-item';
-                noteElement.innerHTML = `
-                    <div class="note-item-title">${note.title || 'ไม่มีหัวข้อ'}</div>
-                    <div class="note-item-date">แก้ไขล่าสุด: ${note.date}</div>
-                `;
-                
-                // เมื่อคลิกที่กล่องบันทึกเก่า ให้ดึงขึ้นไปเปิดอ่านและแก้ไข
-                noteElement.addEventListener('click', () => loadNoteToEditor(note.id));
-                notesDisplayArea.appendChild(noteElement);
-            });
-        }
-
-        // ฟังก์ชันสั่งเซฟโน้ต (ทั้งเขียนใหม่ และ อัปเดตตัวเก่าทับ)
-        function saveNote() {
-            const titleText = noteTitleInput.value.trim();
-            const contentHtml = quill.getSemanticHTML(); // เก็บคอนเทนต์แบบ Rich HTML จาก Quill
-            
-            if (!titleText && quill.getText().trim() === '') {
-                alert('โปรดระบุหัวข้อหรือพิมพ์เนื้อหาบันทึกก่อนกดเซฟครับ');
-                return;
-            }
-
-            const timestamp = new Date().toLocaleString('th-TH');
-
-            if (activeNoteId) {
-                // เคสเปิดแก้ไขตัวเก่า: หาไอดีเดิมแล้วเขียนข้อมูลทับลงไป
-                notesArray = notesArray.map(note => {
-                    if (note.id === activeNoteId) {
-                        return { ...note, title: titleText, content: contentHtml, date: timestamp };
-                    }
-                    return note;
-                });
-            } else {
-                // เคสเขียนบันทึกใหม่: สร้างออบเจกต์โน้ตตัวใหม่เข้า Array
-                const newNote = {
-                    id: Date.now().toString(),
-                    title: titleText,
-                    content: contentHtml,
-                    date: timestamp
-                };
-                notesArray.unshift(newNote); // เอาบันทึกใหม่ล่าสุดขึ้นไว้บนสุด
-            }
-
-            // บันทึกความจำลง LocalStorage และรีเซ็ตฟอร์ม
-            localStorage.setItem('myshortnot_data', JSON.stringify(notesArray));
-            resetEditorForm();
-            renderNotesList();
-            alert('บันทึกข้อมูลเรียบร้อยแล้วครับ!');
-        }
-
-        // ฟังก์ชันเปิดดูโน้ตเก่าที่บันทึกไว้ขึ้นมาบนจอเขียน
-        function loadNoteToEditor(id) {
-            const targetNote = notesArray.find(note => note.id === id);
-            if (targetNote) {
-                activeNoteId = targetNote.id;
-                noteTitleInput.value = targetNote.title;
-                quill.setContents([]); // ล้างค่าเดิมในเอดิเตอร์
-                quill.clipboard.dangerouslyPasteHTML(targetNote.content); // วางโครงโค้ด HTML เก่าลงไปใน Quill
-                
-                deleteBtn.style.display = 'inline-block'; // เปิดให้ปุ่มลบโผล่ขึ้นมาใช้งาน
-                window.scrollTo({ top: 0, behavior: 'smooth' }); // เลื่อนจอกลับขึ้นไปเขียนด้านบนสมูทๆ
-            }
-        }
-
-        // ฟังก์ชันลบโน้ต
-        function deleteNote() {
-            if (activeNoteId && confirm('คุณมั่นใจใช่ไหมว่าต้องการลบบันทึกนี้อย่างถาวร?')) {
-                notesArray = notesArray.filter(note => note.id !== activeNoteId);
-                localStorage.setItem('myshortnot_data', JSON.stringify(notesArray));
-                resetEditorForm();
-                renderNotesList();
-            }
-        }
-
-        // ฟังก์ชันเคลียร์หน้าจอสำหรับการเขียนใหม่
-        function resetEditorForm() {
-            activeNoteId = null;
-            noteTitleInput.value = '';
-            quill.setContents([]);
-            deleteBtn.style.display = 'none'; // ซ่อนปุ่มลบไปก่อน
-        }
-
-        // ดักจับจับเหตุการณ์ของปุ่มบันทึกและปุ่มลบ
-        saveBtn.addEventListener('click', saveNote);
-        deleteBtn.addEventListener('click', deleteNote);
-
-        // สั่งรันแสดงผลรายการโน้ตเก่าทันทีเมื่อเปิดเบราว์เซอร์
-        renderNotesList();
     </script>
 </body>
 </html>
