@@ -9,88 +9,68 @@
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
 
     <style>
-        /* 1. ตั้งค่าสีในโหมดปกติ (Light Mode) */
+        /* ─── 1. ระบบตัวแปรสี (CSS Variables) ─── */
         :root {
+            /* โหมดปกติ (Light Mode) */
             --bg-color: #ffffff;
             --text-color: #333333;
             --btn-bg: #f0f0f0;
             --btn-text: #333333;
-            --border-color: #cccccc;
             
-            /* ดึงตัวแปรเดิมของแอปมาร่วมใช้ในโหมดปกติ */
+            /* ดึงตัวแปรระบบเดิมของคุณมารองรับสไตล์แอป */
             --bg: #ffffff;
             --text: #333333;
             --border: #cccccc; 
             --radius-sm: 8px;
         }
 
-        /* 2. ตั้งค่าสีเมื่อเปิด (Dark Mode) */
         body.dark-mode {
+            /* โหมดมืด (Dark Mode) */
             --bg-color: #121212;
             --text-color: #e0e0e0;
             --btn-bg: #2a2a2a;
             --btn-text: #ffffff;
-            --border-color: #444444;
             
-            /* เปลี่ยนค่าตัวแปรเดิมให้กลายเป็นสีมืด */
+            /* สลับค่าตัวแปรระบบเดิมให้กลายเป็นเฉดสีมืด */
             --bg: #1e1e1e;
             --text: #e0e0e0;
             --border: #444444;
         }
 
-        /* 3. นำตัวแปรสีไปใช้กับร่างกายเว็บ */
+        /* ─── 2. สไตล์หลักของหน้าเว็บ (Cleaned CSS) ─── */
         body {
             background-color: var(--bg-color) !important;
             color: var(--text-color) !important;
-            transition: background-color 0.3s, color 0.3s;
             font-family: 'Sarabun', sans-serif;
             margin: 0;
             padding: 0;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        /* สไตล์ส่วนหัวของ Quill Editor Toolbar ให้เข้ากับ Dark Mode */
-        .ql-toolbar.ql-snow {
-            border: 1px solid var(--border) !important;
-            border-top-left-radius: var(--radius-sm);
-            border-top-right-radius: var(--radius-sm);
-            background: var(--bg) !important;
-            transition: background-color 0.3s, border-color 0.3s;
-        }
-        .ql-container.ql-snow {
-            border: 1px solid var(--border) !important;
-            border-bottom-left-radius: var(--radius-sm);
-            border-bottom-right-radius: var(--radius-sm);
-            background: var(--bg) !important;
-            font-family: 'Sarabun', sans-serif;
-            font-size: 14px;
-            transition: background-color 0.3s, border-color 0.3s;
-        }
-        .ql-snow .ql-stroke {
-            stroke: var(--text) !important;
-        }
-        .ql-snow .ql-fill {
-            fill: var(--text) !important;
-        }
-        .ql-snow .ql-picker {
-            color: var(--text) !important;
-        }
-
-        /* สไตล์แต่งหน้าตาและการจัดวางปุ่มสวิตช์ Dark Mode */
-        .header-container {
+        /* ส่วนหัวแอปที่มีชื่อแอปกับปุ่มสวิตช์ */
+        .app-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 20px;
+            padding: 15px 20px;
             background-color: var(--bg);
             border-bottom: 1px solid var(--border);
             transition: background-color 0.3s, border-color 0.3s;
         }
 
+        .header-title {
+            margin: 0;
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--text);
+        }
+
+        /* ปุ่มสวิตช์ Dark Mode */
         .theme-btn {
             padding: 8px 16px;
             background-color: var(--btn-bg);
             color: var(--btn-text);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             border-radius: 20px;
             cursor: pointer;
             font-weight: bold;
@@ -104,68 +84,89 @@
             opacity: 0.8;
         }
 
-        /* สไตล์ของพื้นที่เนื้อหาหลัก */
+        /* พื้นที่เนื้อหาหลักของแอปเดิมของคุณ */
         #app-screen {
             padding: 20px;
+            box-sizing: border-box;
         }
+
+        /* ─── 3. ปรับแต่ง Quill Editor ให้รองรับโหมดมืด ─── */
+        .ql-toolbar.ql-snow {
+            border: 1px solid var(--border) !important;
+            border-top-left-radius: var(--radius-sm);
+            border-top-right-radius: var(--radius-sm);
+            background: var(--bg) !important;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .ql-container.ql-snow {
+            border: 1px solid var(--border) !important;
+            border-bottom-left-radius: var(--radius-sm);
+            border-bottom-right-radius: var(--radius-sm);
+            background: var(--bg) !important;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 14px;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        /* ปรับสีไอคอนเครื่องมือและตัวอักษรใน Quill ให้สลับตามโหมด */
+        .ql-snow .ql-stroke { stroke: var(--text) !important; }
+        .ql-snow .ql-fill { fill: var(--text) !important; }
+        .ql-snow .ql-picker { color: var(--text) !important; }
     </style>
 </head>
 <body>
 
-    <div class="header-container">
-        <h2 style="margin: 0; color: var(--text);">MYShortNot</h2>
+    <div class="app-header">
+        <div class="header-title">MYShortNot</div>
         
         <button id="theme-toggle" class="theme-btn">
-            <span id="theme-icon">🌙</span> <span id="theme-text">Dark Mode</span>
+            <span id="theme-icon">🌙</span>
+            <span id="theme-text">Dark Mode</span>
         </button>
     </div>
 
     <div id="app-screen">
         <header>
-            <div class="header-brand" id="header-brand" style="color: var(--text); font-size: 20px; font-weight: bold; margin-bottom: 15px;">
+            <div class="header-brand" id="header-brand" style="color: var(--text); font-size: 18px; font-weight: bold; margin-bottom: 15px;">
                 สมุดโน้ตส่วนตัวของฉัน
             </div>
         </header>
 
-        <div id="editor-container" style="height: 300px; margin-top: 10px;">
-            <p>พิมพ์ข้อความสั้นๆ หรือโน้ตสำคัญของคุณที่นี่...</p>
+        <div id="editor-container" style="height: 350px;">
+            <p>พิมพ์ข้อความหรือบันทึกโน้ตสำคัญของคุณตรงนี้...</p>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
     <script>
-        // เริ่มการทำงานของ Quill Editor
+        // เรียกใช้งาน Quill Editor
         const quill = new Quill('#editor-container', {
             theme: 'snow'
         });
 
-        // ────────────────────────────────────────────────────────
-        // ระบบควบคุมการสลับ Dark Mode / Light Mode และระลึกความจำ
-        // ────────────────────────────────────────────────────────
+        // เปิดระบบสลับโหมดและดึงความจำเบราว์เซอร์
         const themeToggleBtn = document.getElementById('theme-toggle');
         const themeIcon = document.getElementById('theme-icon');
         const themeText = document.getElementById('theme-text');
 
-        // 1. ตรวจสอบความจำเดิมในเบราว์เซอร์ตอนเข้าเว็บ
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark-mode');
-            themeIcon.textContent = '☀️';
-            themeText.textContent = 'Light Mode';
+        // ฟังก์ชันสั่งเปลี่ยนข้อความบนปุ่ม
+        function updateButtonUI(isDark) {
+            themeIcon.textContent = isDark ? '☀️' : '🌙';
+            themeText.textContent = isDark ? 'Light Mode' : 'Dark Mode';
         }
 
-        // 2. ระบบดักจับการกดปุ่มสลับโหมด
+        // 1. ตรวจเช็คความจำเดิมตอนที่เพิ่งเปิดหน้าเว็บเข้ามา
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            updateButtonUI(true);
+        }
+
+        // 2. สลับโหมดและบันทึกความจำเมื่อมีการกดปุ่ม
         themeToggleBtn.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            
-            if (document.body.classList.contains('dark-mode')) {
-                localStorage.setItem('theme', 'dark'); // บันทึกความจำโหมดมืด
-                themeIcon.textContent = '☀️';
-                themeText.textContent = 'Light Mode';
-            } else {
-                localStorage.setItem('theme', 'light'); // บันทึกความจำโหมดสว่าง
-                themeIcon.textContent = '🌙';
-                themeText.textContent = 'Dark Mode';
-            }
+            const isDarkModeNow = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', isDarkModeNow ? 'dark' : 'light');
+            updateButtonUI(isDarkModeNow);
         });
     </script>
 </body>
